@@ -1,14 +1,13 @@
 <template>
   <draggable v-model="columns" class="d-flex content">
     <v-card
-      width="333px"
       class="list-column"
       v-for="column in columns"
       :key="column.id"
       elevation="24"
       color="rgba(0,0,0,.4)"
     >
-      <v-app-bar dark color="rgba(0,0,0,.4)">
+      <v-app-bar dark color="rgba(0,0,0,.4)" width="300px">
         <v-toolbar-title>{{column.name}}</v-toolbar-title>
         <div class="flex-grow-1"></div>
         <v-btn icon @click="addItem()">
@@ -38,7 +37,7 @@
       </v-container>
     </v-card>
     <div class="btn--addColumn__Task">
-      <v-btn block color="#e6e6e6" class="color" @click="addTask()">
+      <v-btn block color="#e6e6e6" class="color" @click="addTask()" width="300px">
         <v-icon>mdi-plus</v-icon>
       </v-btn>
     </div>
@@ -69,6 +68,32 @@ export default {
           ]
         },
          {
+          name: "TODO",
+          items: [
+            {
+              color: "#1F7087",
+              title: "qưewqewqewqewqewqe qưewqewqewqewqewqe qưewqewqewqewqewqe "
+            },
+            {
+              color: "#1F7087",
+              title: "Halcyon Days"
+            }
+          ]
+        },
+        {
+          name: "TODO",
+          items: [
+            {
+              color: "#1F7087",
+              title: "qưewqewqewqewqewqe qưewqewqewqewqewqe qưewqewqewqewqewqe "
+            },
+            {
+              color: "#1F7087",
+              title: "Halcyon Days"
+            }
+          ]
+        },
+        {
           name: "TODO",
           items: [
             {
@@ -153,7 +178,7 @@ export default {
 
 <style>
 .content {
-  overflow-x: auto;
+  overflow-x: scroll;
   flex-direction: row;
   flex-wrap: nowrap;
   padding-bottom: 100px;
@@ -162,9 +187,10 @@ export default {
   background-position: center center;
   background-attachment: fixed;
   height: 100%;
+  margin-right:5%;
 }
 .list-column {
-  margin: 100px 2% auto 50px;
+  margin: 100px 3% auto 50px;
 }
 .v-list-item__content {
   display: initial;
