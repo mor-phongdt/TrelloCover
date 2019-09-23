@@ -33,21 +33,30 @@
         <v-text-field
               v-if='column.addTask'
               v-model="column.model"
-              class="pa-2"
+              class="pa-3"
               label="Solo"
-              placeholder="Placeholder"
+              placeholder="Type title..."
               @keyup.enter="submit(column.model,column.id)"
               solo
             ></v-text-field>
         <div class="pa-2">
-          <v-btn block color="#e6e6e6" class="color" @click="showInput(column.id)">
+          <v-btn block color="#e6e6e6" class="color" @click="column.addTask=true">
             <v-icon>mdi-plus</v-icon>
           </v-btn>
         </div>
       </v-container>
     </v-card>
+    <v-text-field
+              v-if='flagColumn'
+              v-model="nameColumn"
+              style="margin:100px auto ;width:333px "
+              label="Solo"
+              placeholder="Type title..."
+              @keyup.enter="addColumn(nameColumn)"
+              solo
+            ></v-text-field>
     <div class="btn--addColumn__Task">
-      <v-btn block color="#e6e6e6" class="color" width="300px">
+      <v-btn block color="#e6e6e6" class="color" width="300px" @click="flagColumn=true" v-if='!flagColumn'>
         <v-icon>mdi-plus</v-icon>
       </v-btn>
     </div>
@@ -63,6 +72,8 @@ export default {
   },
   data() {
     return {
+      flagColumn:false,
+      nameColumn:'',
       columns: [
         {
           id:0,
@@ -118,15 +129,22 @@ export default {
     };
   },
   methods : {
-    showInput(id) {
-      this.columns[id].addTask = !this.columns[id].addTask;
-    },
     submit(value,idColumn) {
       this.columns[idColumn].items.push({
         title : value
       });
       this.columns[idColumn].model = '';
       this.columns[idColumn].addTask = !this.columns[idColumn].addTask;
+    },
+    addColumn(nameColumn) {
+      this.columns.push({
+        id:this.columns.length,
+        name: nameColumn,
+        addTask:false,
+        model:'',
+        items : [],
+      });
+      this.flagColumn = false
     }
   }
 };
