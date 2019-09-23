@@ -1,0 +1,11 @@
+.grid {
+    display: grid;
+    grid-template-columns: 50% 50%;
+    width: 80%;
+}
+
+.bg--project {
+    background-size: cover;
+    background-position: bottom;
+    cursor: pointer;
+}
