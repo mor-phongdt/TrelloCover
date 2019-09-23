@@ -1,12 +1,12 @@
 <template>
-  <v-card>
+  <div>
        <v-app-bar
-        absolute
-        elevate-on-scroll
+        fixed
         class="elevation-6"
         color="transparent"
+        hide-on-scroll
       >
-        <v-toolbar-title class="white--text"><h3>Kaban Board</h3></v-toolbar-title>
+        <v-toolbar-title class="white--text"><h3>KMA Board</h3></v-toolbar-title>
       </v-app-bar>
     <v-navigation-drawer
       v-model="drawer"
@@ -49,7 +49,7 @@
           </div>
         </template>
     </v-navigation-drawer>
-  </v-card>
+  </div>
 </template>
 
 <script>

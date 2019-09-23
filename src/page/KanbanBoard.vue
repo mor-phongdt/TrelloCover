@@ -37,6 +37,11 @@
         </div>
       </v-container>
     </v-card>
+    <div class="btn--addColumn__Task">
+      <v-btn block color="#e6e6e6" class="color" @click="addTask()">
+        <v-icon>mdi-plus</v-icon>
+      </v-btn>
+    </div>
   </draggable>
 </template>
 
@@ -50,6 +55,45 @@ export default {
   data() {
     return {
       columns: [
+        {
+          name: "TODO",
+          items: [
+            {
+              color: "#1F7087",
+              title: "qưewqewqewqewqewqe qưewqewqewqewqewqe qưewqewqewqewqewqe "
+            },
+            {
+              color: "#1F7087",
+              title: "Halcyon Days"
+            }
+          ]
+        },
+         {
+          name: "TODO",
+          items: [
+            {
+              color: "#1F7087",
+              title: "qưewqewqewqewqewqe qưewqewqewqewqewqe qưewqewqewqewqewqe "
+            },
+            {
+              color: "#1F7087",
+              title: "Halcyon Days"
+            }
+          ]
+        },
+        {
+          name: "TODO",
+          items: [
+            {
+              color: "#1F7087",
+              title: "qưewqewqewqewqewqe qưewqewqewqewqewqe qưewqewqewqewqewqe "
+            },
+            {
+              color: "#1F7087",
+              title: "Halcyon Days"
+            }
+          ]
+        },
         {
           name: "TODO",
           items: [
@@ -90,28 +134,15 @@ export default {
             {
               color: "secondary",
               title: "Halcyon Days"
-            },{
-              color: "secondary",
-              title: "Halcyon Days"
-            },{
-              color: "secondary",
-              title: "Halcyon Days"
-            },{
-              color: "secondary",
-              title: "Halcyon Days"
-            },{
-              color: "secondary",
-              title: "Halcyon Days"
-            },{
-              color: "secondary",
-              title: "Halcyon Days"
-            },{
-              color: "secondary",
-              title: "Halcyon Days"
-            },{
+            },
+            {
               color: "secondary",
               title: "Halcyon Days"
             },
+            {
+              color: "secondary",
+              title: "Halcyon Days"
+            }
           ]
         }
       ]
@@ -126,10 +157,11 @@ export default {
   flex-direction: row;
   flex-wrap: nowrap;
   padding-bottom: 100px;
-  background-image: url('http://demo.module-5.com/uploads/board/2216a3078676bc52aac374114e09d925');
+  background-image: url("http://demo.module-5.com/uploads/board/2216a3078676bc52aac374114e09d925");
   background-size: cover;
-  background-position: 50%;
-  height: 100vh;
+  background-position: center center;
+  background-attachment: fixed;
+  height: 100%;
 }
 .list-column {
   margin: 100px 2% auto 50px;
@@ -137,5 +169,7 @@ export default {
 .v-list-item__content {
   display: initial;
 }
-
+.btn--addColumn__Task {
+  margin-top: 100px;
+}
 </style>
