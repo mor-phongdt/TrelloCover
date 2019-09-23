@@ -1,5 +1,5 @@
 <template>
-  <div style="background:#14181d">
+  <div style="background:#14181d;height:100%">
     <DialogProject />
     <div style="margin:100px auto auto 8%" class="grid">
       <v-card

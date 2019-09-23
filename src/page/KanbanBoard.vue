@@ -6,6 +6,7 @@
       :key="column.id"
       elevation="24"
       color="rgba(0,0,0,.4)"
+       width="300px"
     >
       <v-app-bar dark color="rgba(0,0,0,.4)" width="300px">
         <v-toolbar-title>{{column.name}}</v-toolbar-title>
@@ -14,30 +15,39 @@
           <v-icon>mdi-folder-remove</v-icon>
         </v-btn>
       </v-app-bar>
-      <v-container class="pa-2" fluid>
+      <v-container class="pa-2" fluid >
         <draggable :list="column.items" group="people">
-          <v-col v-for="(item, i) in column.items" :key="i">
-            <v-card :color="item.color" dark>
+          <v-col v-for="(item, i) in column.items" :key="i" >
+            <v-card color="secondary" dark>
               <v-btn icon @click="removeItem()" style="float:right">
                 <v-icon>mdi-close-circle</v-icon>
               </v-btn>
               <v-list-item three-line>
-                <v-list-item-content class="align-self-start">
+                <v-list-item-content class="align-self-start" >
                   <div>{{item.title}}</div>
                 </v-list-item-content>
               </v-list-item>
             </v-card>
           </v-col>
         </draggable>
+        <v-text-field
+              v-if='column.addTask'
+              v-model="column.model"
+              class="pa-2"
+              label="Solo"
+              placeholder="Placeholder"
+              @keyup.enter="submit(column.model,column.id)"
+              solo
+            ></v-text-field>
         <div class="pa-2">
-          <v-btn block color="#e6e6e6" class="color" @click="addTask()">
+          <v-btn block color="#e6e6e6" class="color" @click="showInput(column.id)">
             <v-icon>mdi-plus</v-icon>
           </v-btn>
         </div>
       </v-container>
     </v-card>
     <div class="btn--addColumn__Task">
-      <v-btn block color="#e6e6e6" class="color" @click="addTask()" width="300px">
+      <v-btn block color="#e6e6e6" class="color" width="300px">
         <v-icon>mdi-plus</v-icon>
       </v-btn>
     </div>
@@ -55,123 +65,69 @@ export default {
     return {
       columns: [
         {
+          id:0,
           name: "TODO",
+          addTask:false,
+          model:'',
           items: [
             {
-              color: "#1F7087",
-              title: "qưewqewqewqewqewqe qưewqewqewqewqewqe qưewqewqewqewqewqe "
+              title: "qưewqewqewqewqewqe qưewqewqewqewqewqe qưewqewqewqewqewqe"
             },
             {
-              color: "#1F7087",
               title: "Halcyon Days"
             }
           ]
         },
-         {
-          name: "TODO",
-          items: [
-            {
-              color: "#1F7087",
-              title: "qưewqewqewqewqewqe qưewqewqewqewqewqe qưewqewqewqewqewqe "
-            },
-            {
-              color: "#1F7087",
-              title: "Halcyon Days"
-            }
-          ]
-        },
+        
         {
-          name: "TODO",
-          items: [
-            {
-              color: "#1F7087",
-              title: "qưewqewqewqewqewqe qưewqewqewqewqewqe qưewqewqewqewqewqe "
-            },
-            {
-              color: "#1F7087",
-              title: "Halcyon Days"
-            }
-          ]
-        },
-        {
-          name: "TODO",
-          items: [
-            {
-              color: "#1F7087",
-              title: "qưewqewqewqewqewqe qưewqewqewqewqewqe qưewqewqewqewqewqe "
-            },
-            {
-              color: "#1F7087",
-              title: "Halcyon Days"
-            }
-          ]
-        },
-        {
-          name: "TODO",
-          items: [
-            {
-              color: "#1F7087",
-              title: "qưewqewqewqewqewqe qưewqewqewqewqewqe qưewqewqewqewqewqe "
-            },
-            {
-              color: "#1F7087",
-              title: "Halcyon Days"
-            }
-          ]
-        },
-        {
-          name: "TODO",
-          items: [
-            {
-              color: "#1F7087",
-              title: "qưewqewqewqewqewqe qưewqewqewqewqewqe qưewqewqewqewqewqe "
-            },
-            {
-              color: "#1F7087",
-              title: "Halcyon Days"
-            }
-          ]
-        },
-        {
+          id:1,
           name: "DOING",
+          addTask:false,
           items: [
             {
-              color: "#1F7087",
               title: "abc"
             },
             {
-              color: "secondary",
               title: "Halcyon Days"
             }
           ]
         },
         {
+          id:2,
           name: "DONE",
+          addTask:false,
           items: [
             {
-              color: "#1F7087",
               title: "abc"
             },
             {
-              color: "secondary",
               title: "Halcyon Days"
             },
             {
-              color: "secondary",
               title: "Halcyon Days"
             },
             {
-              color: "secondary",
               title: "Halcyon Days"
             },
             {
-              color: "secondary",
               title: "Halcyon Days"
             }
           ]
         }
       ]
     };
+  },
+  methods : {
+    showInput(id) {
+      this.columns[id].addTask = !this.columns[id].addTask;
+    },
+    submit(value,idColumn) {
+      this.columns[idColumn].items.push({
+        title : value
+      });
+      this.columns[idColumn].model = '';
+      this.columns[idColumn].addTask = !this.columns[idColumn].addTask;
+    }
   }
 };
 </script>
@@ -187,7 +143,7 @@ export default {
   background-position: center center;
   background-attachment: fixed;
   height: 100%;
-  margin-right:5%;
+  margin-right:4%;
 }
 .list-column {
   margin: 100px 3% auto 50px;
