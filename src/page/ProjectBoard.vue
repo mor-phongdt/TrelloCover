@@ -5,17 +5,20 @@
       <v-card
         class="mx-auto mb-5 bg--project"
         width="90%"
-        v-for="item in items"
+        v-for="item in getlistProjects"
         dark
-        :style="{backgroundImage:item.background}"
+        :style="{backgroundImage:item.themeProject}"
         :key="item.id"
+        @click ="goToDetailProject(item.id)"
       >
         <v-card-title>
           <v-icon large left >mdi-briefcase</v-icon>
-          <span class="title font-weight-bold">{{item.projectName}}</span>
+          <span class="title font-weight-bold">{{item.nameProject}}</span>
+          <v-spacer/>
+          <v-icon right @click="remove(item.id)">mdi-close-circle</v-icon>
         </v-card-title>
 
-        <v-card-text class="headline font-weight-light">{{item.projectContent}}</v-card-text>
+        <v-card-text class="headline font-weight-light">{{item.contentProject}}</v-card-text>
 
         <v-card-actions>
           <v-list-item class="grow">
@@ -27,7 +30,7 @@
             </v-list-item-avatar>
 
             <v-list-item-content>
-              <v-list-item-title >{{item.nameProjectOwner}}</v-list-item-title>
+              <v-list-item-title >{{item.owner}}</v-list-item-title>
             </v-list-item-content>
           </v-list-item>
         </v-card-actions>
@@ -41,6 +44,7 @@
 
 <script>
 import DialogProject from "@/components/DialogProject.vue";
+import { mapActions,mapGetters } from "vuex";
 
 export default {
   components: {
@@ -48,69 +52,39 @@ export default {
   },
   data() {
     return {
-      items: [
-        {
-          id: 1,
-          projectName: "Project1",
-          projectContent: "abccccc",
-          nameProjectOwner: "Phong",
-          background : "url(http://demo.module-5.com/uploads/board/2216a3078676bc52aac374114e09d925)",
-        },
-         {
-          id: 1234,
-          projectName: "Project1",
-          projectContent: "abccccc",
-          nameProjectOwner: "Phong",
-          background : "url(http://demo.module-5.com/uploads/board/2216a3078676bc52aac374114e09d925)",
-        },
-         {
-          id: 1213,
-          projectName: "Project1",
-          projectContent: "abccccc",
-          nameProjectOwner: "Phong",
-          background : "url(http://demo.module-5.com/uploads/board/2216a3078676bc52aac374114e09d925)",
-        },
-         {
-          id: 1222,
-          projectName: "Project1",
-          projectContent: "abccccc",
-          nameProjectOwner: "Phong",
-          background : "url(http://demo.module-5.com/uploads/board/2216a3078676bc52aac374114e09d925)",
-        },
-         {
-          id: 10,
-          projectName: "Project1",
-          projectContent: "abccccc",
-          nameProjectOwner: "Phong",
-          background : "url(http://demo.module-5.com/uploads/board/2216a3078676bc52aac374114e09d925)",
-        },
-        {
-          id: 3,
-          projectName: "Project1",
-          projectContent: "abccccc",
-          nameProjectOwner: "Phong",
-          background : "url(https://images.unsplash.com/photo-1502481851512-e9e2529bfbf9?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1050&q=80)"
-        },
-        {
-          id: 2,
-          projectName: "Project1",
-          projectContent: "abccccc",
-          nameProjectOwner: "Phong",
-          background : "url(https://images.unsplash.com/photo-1419242902214-272b3f66ee7a?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1087&q=80)"
-        },
-        {
-          id: 4,
-          projectName: "Project1",
-          projectContent: "abccccc",
-          nameProjectOwner: "Phong",
-          background : "url(https://images.unsplash.com/photo-1488866022504-f2584929ca5f?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1043&q=80)"
-        },
-      ]
+
     };
   },
+  created() {
+    const loader = this.$loading.show();
+    this.getAllProject()
+    .then(()=>{
+    loader.hide();
+    })
+  },
+  computed : {
+    ...mapGetters('project',['getlistProjects'])
+  },
   methods : {
+    ...mapActions("project", [
+      "getAllProject",
+      "deleteProject"
+      ]),
     addProject() {
       this.$store.commit("showDialog");
+    },
+    remove(id) {
+      let loader = this.$loading.show();
+      this.deleteProject(id)
+      .then(()=>{
+        loader.hide();
+      })
+    },
+    goToDetailProject(id){
+      this.$router.push({
+        name: "DetailProjectPage",
+        params: { id: id }
+      });
     }
   }
 };

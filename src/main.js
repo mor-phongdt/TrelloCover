@@ -9,7 +9,6 @@ import './registerServiceWorker';
 import vuetify from './plugins/vuetify';
 import 'vue-loading-overlay/dist/vue-loading.css';
 
-
 Vue.use(Loading);
 Vue.use(VeeValidate);
 
@@ -23,3 +22,5 @@ new Vue({
   template: '<App/>',
   render: h => h(App),
 }).$mount('#app');
+
+export default app

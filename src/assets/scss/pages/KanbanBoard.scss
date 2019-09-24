@@ -1,0 +1,19 @@
+.content {
+    flex-direction: row;
+    flex-wrap: nowrap;
+    padding-bottom: 100px;
+    background-size: cover;
+    background-position: 50%;
+    background-attachment: fixed;
+    height: 100%;
+    margin-right:4%;
+  }
+  .list-column {
+    margin: 100px 3% auto 50px;
+  }
+  .v-list-item__content {
+    display: initial;
+  }
+  .btn--addColumn__Task {
+    margin-top: 100px;
+  }

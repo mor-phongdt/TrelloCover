@@ -1,15 +1,39 @@
-// import firebase from 'firebase/app';
-// import 'firebase/storage';
+import firebase from 'firebase/app';
+import 'firebase/storage';
+import 'firebase/firestore';
 
-// if (!firebase.apps.length) {
-//   firebase.initializeApp({
-//     apiKey: 'AIzaSyBjDNL1tp1Qd4K2ho3rceO13F5r-qcceS4',
-//     authDomain: 'cms-zing.firebaseapp.com',
-//     databaseURL: 'https://cms-zing.firebaseio.com',
-//     projectId: 'cms-zing',
-//     storageBucket: 'cms-zing.appspot.com',
-//     messagingSenderId: '1071727462659',
-//     appId: '1:1071727462659:web:ab2f02d2f04f0dd1',
-//   });
-// }
-// export default firebase;
+if (!firebase.apps.length) {
+    firebase.initializeApp({
+        apiKey: "AIzaSyAJ1nUWO-nJW5_oIWE7UgJyHfLIPQWob9s",
+        authDomain: "kma-board.firebaseapp.com",
+        databaseURL: "https://kma-board.firebaseio.com",
+        projectId: "kma-board",
+        storageBucket: "kma-board.appspot.com",
+        messagingSenderId: "535045847971",
+        appId: "1:535045847971:web:eabc2b12bf59177f7f7816"
+    });
+}
+const db = firebase.firestore();
+
+const projectCollection = db.collection('Project')
+
+
+export {
+    firebase,
+    projectCollection
+}
+
+
+// const db = firebase.firestore();
+    // // db.collection('Project').doc('xKlDkaHi26P2nKycJY44').collection('task').onSnapshot((snapshot)=>{ 
+    // //   console.log(snapshot)
+    // //   snapshot.docChanges().forEach((item)=>{
+    // //     console.log(item.doc.data())
+    // //   })
+    // // })
+    // db.collectionGroup('task').where('ownerTask','==','abc@gmail.com').onSnapshot((snapshot)=>{ 
+    //   console.log(snapshot)
+    //   snapshot.docChanges().forEach((item)=>{
+    //     console.log(item.doc.data())
+    //   })
+    // })

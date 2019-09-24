@@ -1,5 +1,5 @@
 <template>
-  <draggable v-model="columns" class="d-flex content">
+  <div class="d-flex content" :style="{backgroundImage:background}">
     <v-card
       class="list-column"
       v-for="column in columns"
@@ -10,10 +10,6 @@
     >
       <v-app-bar dark color="rgba(0,0,0,.4)" width="300px">
         <v-toolbar-title>{{column.name}}</v-toolbar-title>
-        <div class="flex-grow-1"></div>
-        <v-btn icon @click="addItem()">
-          <v-icon>mdi-folder-remove</v-icon>
-        </v-btn>
       </v-app-bar>
       <v-container class="pa-2" fluid >
         <draggable :list="column.items" group="people">
@@ -46,25 +42,13 @@
         </div>
       </v-container>
     </v-card>
-    <v-text-field
-              v-if='flagColumn'
-              v-model="nameColumn"
-              style="margin:100px auto ;width:333px "
-              label="Solo"
-              placeholder="Type title..."
-              @keyup.enter="addColumn(nameColumn)"
-              solo
-            ></v-text-field>
-    <div class="btn--addColumn__Task">
-      <v-btn block color="#e6e6e6" class="color" width="300px" @click="flagColumn=true" v-if='!flagColumn'>
-        <v-icon>mdi-plus</v-icon>
-      </v-btn>
-    </div>
-  </draggable>
+  </div>
 </template>
 
 <script>
+import {projectCollection} from '@/plugins/firebase';
 import draggable from "vuedraggable";
+import { mapActions,mapGetters } from "vuex";
 
 export default {
   components: {
@@ -72,63 +56,54 @@ export default {
   },
   data() {
     return {
-      flagColumn:false,
-      nameColumn:'',
+      background:'',
       columns: [
         {
           id:0,
           name: "TODO",
           addTask:false,
           model:'',
-          items: [
-            {
-              title: "qưewqewqewqewqewqe qưewqewqewqewqewqe qưewqewqewqewqewqe"
-            },
-            {
-              title: "Halcyon Days"
-            }
-          ]
+          items: []
         },
-        
         {
           id:1,
           name: "DOING",
           addTask:false,
-          items: [
-            {
-              title: "abc"
-            },
-            {
-              title: "Halcyon Days"
-            }
-          ]
+          items: []
         },
         {
           id:2,
           name: "DONE",
           addTask:false,
-          items: [
-            {
-              title: "abc"
-            },
-            {
-              title: "Halcyon Days"
-            },
-            {
-              title: "Halcyon Days"
-            },
-            {
-              title: "Halcyon Days"
-            },
-            {
-              title: "Halcyon Days"
-            }
-          ]
+          items: []
         }
-      ]
+      ],
+      wacthTask:[]
     };
   },
+  created() {
+    const loader = this.$loading.show();
+    this.uid = this.$route.params.id;
+    this.wacthTask = this.columns[0].items
+    this.getProjectById(this.uid)
+    .then(()=>{
+      this.background = this.projectDetail.themeProject;
+      loader.hide()
+    })
+    .catch((error)=>{
+      console.log(error.message)
+    })
+  },
+  watch : {
+    wacthTask(){
+      console.log('hahahihi')
+    }
+  },
+  computed : {
+    ...mapGetters("project", ["projectDetail"]),
+  },
   methods : {
+    ...mapActions("project", ["getProjectById"]),
     submit(value,idColumn) {
       this.columns[idColumn].items.push({
         title : value
@@ -136,40 +111,6 @@ export default {
       this.columns[idColumn].model = '';
       this.columns[idColumn].addTask = !this.columns[idColumn].addTask;
     },
-    addColumn(nameColumn) {
-      this.columns.push({
-        id:this.columns.length,
-        name: nameColumn,
-        addTask:false,
-        model:'',
-        items : [],
-      });
-      this.flagColumn = false
-    }
   }
 };
 </script>
-
-<style>
-.content {
-  overflow-x: scroll;
-  flex-direction: row;
-  flex-wrap: nowrap;
-  padding-bottom: 100px;
-  background-image: url("http://demo.module-5.com/uploads/board/2216a3078676bc52aac374114e09d925");
-  background-size: cover;
-  background-position: center center;
-  background-attachment: fixed;
-  height: 100%;
-  margin-right:4%;
-}
-.list-column {
-  margin: 100px 3% auto 50px;
-}
-.v-list-item__content {
-  display: initial;
-}
-.btn--addColumn__Task {
-  margin-top: 100px;
-}
-</style>
