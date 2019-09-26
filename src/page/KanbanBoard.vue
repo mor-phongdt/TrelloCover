@@ -84,8 +84,12 @@ export default {
       idColumnTodo:'',
       idColumnDoing : '',
       idColumnDone : '',
-      idColumnAdd : '',
-      flagFirst: 0
+      taskMove : {},
+      flagFirst1 : false,
+      flagFirst2 : false,
+      flagFirst3 : false,
+      flagTodo:'',
+      flagSnapshot: undefined,
     };
   },
   created() {
@@ -94,17 +98,17 @@ export default {
     this.getProjectById(this.uid)
       .then(() => {
         this.background = this.projectDetail.themeProject;
-        this.getAllTask(this.uid).then(() => {
+        this.getAllTask(this.uid).then((value) => {
           this.idColumnTodo = this.$store.state.task.idColumnTodo
           this.idColumnDoing = this.$store.state.task.idColumnDoing
           this.idColumnDone = this.$store.state.task.idColumnDone
+          this.flagSnapshot = value;
           this.$store.watch(
             state => state.task.taskTodo,
             () => {
               const msg = this.$store.state.task.taskTodo;
               if (msg !== "") {
                 this.columns[0].items = msg;
-                this.flagFirst = this.flagFirst +1
               }
             }
           );
@@ -114,7 +118,6 @@ export default {
               const msg = this.$store.state.task.taskDoing;
               if (msg !== "") {
                 this.columns[1].items = msg;
-                this.flagFirst = this.flagFirst +1
               }
             }
           );
@@ -124,7 +127,6 @@ export default {
               const msg = this.$store.state.task.taskDone;
               if (msg !== "") {
                 this.columns[2].items = msg;
-                this.flagFirst = this.flagFirst +1
               }
             }
           );
@@ -137,27 +139,28 @@ export default {
   },
   watch: {
     todoWatch: function(newVal, oldVal) {
-      console.log(this.flagFirst)
-      if(newVal.length > this.lengthTodo && this.flagFirst > 3){
-        this.idColumnAdd = this.idColumnTodo
-        console.log(this.idColumnAdd)
+      if(newVal.length > this.lengthTodo && this.flagFirst1){
+        this.flagTodo = this.idColumnTodo
+        console.log('start1')
       }
+      this.flagFirst1 =true
       this.lengthTodo = newVal.length
     },
     doingWatch: function(newVal, oldVal) {
-      console.log(this.flagFirst)
-      if(newVal.length > this.lengthDoing && this.flagFirst > 3){
-        this.idColumnAdd = this.idColumnDoing
-        console.log(this.idColumnAdd)
+      if(newVal.length > this.lengthDoing  && this.flagFirst2){
+        this.flagTodo = this.idColumnDoing
+        console.log(this.taskMove.columnAdd)
+        console.log('start2')
       }
+      this.flagFirst2=true;
       this.lengthDoing = newVal.length
     },
     doneWatch: function(newVal, oldVal) {
-      console.log(this.flagFirst)
-      if(newVal.length > this.lengthDone && this.flagFirst > 3){
-        this.idColumnAdd = this.idColumnDone
-        console.log(this.idColumnAdd)
+      if(newVal.length > this.lengthDone  && this.flagFirst3){
+        this.flagTodo = this.idColumnDone
+        console.log('start3')
       }
+      this.flagFirst3 =true
       this.lengthDone = newVal.length
     },
   },
@@ -178,8 +181,15 @@ export default {
     ...mapActions("project", ["getProjectById"]),
     ...mapActions("task", ["getAllTask", "moveStatusTask"]),
     log: function(evt) {
-      console.log(evt);
-      // if (evt["added"]) this.moveStatusTask();
+       if (evt["added"]){
+        this.taskMove = evt['added']['element'];
+        this.taskMove.projectId = this.uid;
+        this.taskMove.columnAdd = this.flagTodo
+        console.log(this.taskMove.columnAdd)
+        console.log(this.flagSnapshot())
+        
+        this.moveStatusTask(this.taskMove)
+       }
     },
     submit(value, idColumn) {
       this.columns[idColumn].items.push({
