@@ -106,15 +106,15 @@ export default {
             themeProject: this.background
           }).then(() => {
             loader.hide();
-            this.cancel();
             this.nameProject = "";
             this.decription = "";
-            this.background = "";
+            this.cancel();
           });
         }
       });
     },
     cancel() {
+      this.$validator.reset();
       this.$store.commit("closeDialog");
     }
   }

@@ -15,7 +15,7 @@
           <v-icon large left >mdi-briefcase</v-icon>
           <span class="title font-weight-bold">{{item.nameProject}}</span>
           <v-spacer/>
-          <v-icon right @click="remove(item.id)">mdi-close-circle</v-icon>
+          <v-icon right @click.stop="remove(item.id)">mdi-close-circle</v-icon>
         </v-card-title>
 
         <v-card-text class="headline font-weight-light">{{item.contentProject}}</v-card-text>

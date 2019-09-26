@@ -25,7 +25,7 @@ export default {
   actions: {
     async getAllProject({ commit }) {
         let listProjects =[]
-        const response = await projectCollection.orderBy("createdAt", "asc").onSnapshot((snapshot)=>{ 
+        let response = await projectCollection.orderBy("createdAt", "asc").onSnapshot((snapshot)=>{ 
               snapshot.docChanges().forEach((item)=>{
                 if(item.type==='added'){
                     listProjects.push({
@@ -38,18 +38,17 @@ export default {
                     listProjects.splice(index,1);
                 }
               })
-              
+              if(response){
+                commit('setListProject',listProjects);
+            }
          });
-        if(response){
-            commit('setListProject',listProjects);
-        }
+        
         
     },
     async getProjectById({commit},projectId) {
         try{
           const response = await projectCollection.doc(projectId).get()
         if(response){
-          console.log(response.data())
           commit('setProject',response.data())
         }
         }catch(error){
@@ -68,7 +67,8 @@ export default {
     },
     async deleteProject(context , projectId) {
         try{
-            const response = await projectCollection.doc(projectId).delete();
+            const response = projectCollection.doc(projectId).delete();
+
         }catch(error) {
             console.log(error)
         }

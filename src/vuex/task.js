@@ -1,78 +1,116 @@
 import { projectCollection } from '@/plugins/firebase';
 
+
 export default {
   namespaced: true,
   state: {
-    project : {},
-    listProjects : [],
+    taskTodo : [],
+    taskDoing : [],
+    taskDone : [],
+    idColumnTodo : undefined,
+    idColumnDoing : undefined,
+    idColumnDone : undefined
   },
   getters: {
-    projectDetail: state => {
-      return state.project
+    getTaskTodo: state => {
+      return state.taskTodo
     },
-    getlistProjects: state => {
-      return state.listProjects
+    getTaskDoing: state => {
+      return state.taskDoing
+    },
+    getTaskDone: state => {
+      return state.taskDone
     }
   },
   mutations: {
-    setProject: (state, project) => {
-      state.project = project
+    setAllTask: (state, {taskTodo,taskDoing,taskDone}) => {
+      state.taskTodo = taskTodo
+      state.taskDoing = taskDoing
+      state.taskDone = taskDone
     },
-    setListProject: (state, listProjects) => {
-      state.listProjects = listProjects
+    setIdColumnTodo: (state, idColumnTodo) => {
+      state.idColumnTodo = idColumnTodo
     },
-  },
-  actions: {
-    async getAllProject({ commit }) {
-        let listProjects =[]
-        const response = await projectCollection.orderBy("createdAt", "asc").onSnapshot((snapshot)=>{ 
-              snapshot.docChanges().forEach((item)=>{
-                if(item.type==='added'){
-                    listProjects.push({
-                        id: item.doc.id,
-                        ...item.doc.data(),
-                    }) 
-                }
-                if(item.type === 'removed') {
-                   let index = listProjects.findIndex((project)=>{ return item.doc.id===project.id})
-                    listProjects.splice(index,1);
-                }
-              })
-              
-         });
-        if(response){
-            commit('setListProject',listProjects);
-        }
-        
+    setIdColumnDoing: (state, idColumnDoing) => {
+      state.idColumnDoing = idColumnDoing
     },
-    async getProjectById({commit},projectId) {
-        try{
-          const response = await projectCollection.doc(projectId).get()
-        if(response){
-          console.log(response.data())
-          commit('setProject',response.data())
-        }
-        }catch(error){
-          console.log(error)
-        }
-    },
-    async createProject(context,project) {
-        try{
-            const response = await projectCollection.add(project);
-            projectCollection.doc(response.id).collection('column').add({name:'Todo',idColumn:0})
-            projectCollection.doc(response.id).collection('column').add({name:'Doing',idColumn:1})
-            projectCollection.doc(response.id).collection('column').add({name:'Done',idColumn:2})
-        }catch(error){
-            console.log(error)
-        }
-    },
-    async deleteProject(context , projectId) {
-        try{
-            const response = await projectCollection.doc(projectId).delete();
-        }catch(error) {
-            console.log(error)
-        }
+    setIdColumnDone: (state, idColumnDone) => {
+      state.idColumnDone = idColumnDone
     }
   },
+  actions: {
+    async getAllTask({ commit }, projectId) {
+      let taskTodo = []
+      let taskDoing = []
+      let taskDone = []
+      return new Promise((resolve, reject) => {
+        projectCollection.doc(projectId).collection('column').get()
+          .then((response) => {
+            response.forEach((item) => {
+              if (item.data().idColumn == 0) {
+                commit('setIdColumnTodo',item.id)
+                let result = projectCollection.doc(projectId)
+                  .collection('column').doc(item.id)
+                  .collection('task').orderBy("createdAt", "asc").onSnapshot((snapshot) => {
+                    snapshot.docChanges().forEach((task) => {
+                      if (task.type === 'added') {
+                        taskTodo.push({
+                          id: task.doc.id,
+                          status: item.id,
+                          ...task.doc.data(),
+                        })
+                      }
+                    })
+                  });
+              }
+              if (item.data().idColumn == 1) {
+                commit('setIdColumnDoing',item.id)
+                let result = projectCollection.doc(projectId)
+                  .collection('column').doc(item.id)
+                  .collection('task').orderBy("createdAt", "asc").onSnapshot((snapshot) => {
+                    snapshot.docChanges().forEach((task) => {
+                      if (task.type === 'added') {
+                        taskDoing.push({
+                          id: task.doc.id,
+                          status: item.id,
+                          ...task.doc.data(),
+                        })
+                      }
+                    })
+                  });
+              }
+              if (item.data().idColumn == 2) {
+                commit('setIdColumnDone',item.id)
+                let result = projectCollection.doc(projectId)
+                  .collection('column').doc(item.id)
+                  .collection('task').orderBy("createdAt", "asc").onSnapshot((snapshot) => {
+                    snapshot.docChanges().forEach((task) => {
+                      if (task.type === 'added') {
+                        taskDone.push({
+                          id: task.doc.id,
+                          status: item.id,
+                          ...task.doc.data(),
+                        })
+                      }
+                    })
+                  });
+              }
+            })
+          })
+          .then(() => {
+            commit('setAllTask',{taskTodo,taskDoing,taskDone});
+            resolve();
+          })
+          .catch((error) => {
+            console.log(error)
+          })
+      })
 
-};
+    },
+    async moveStatusTask(context, projectId, task) {
+      // let response = projectCollection.doc(projectId)
+      // .collection('column').doc(task.status).get()
+      // console.log(response)
+    }
+  }
+}
