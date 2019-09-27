@@ -141,7 +141,8 @@ export default {
     todoWatch: function(newVal, oldVal) {
       if(newVal.length > this.lengthTodo && this.flagFirst1){
         this.flagTodo = this.idColumnTodo
-        console.log('start1')
+        console.log(this.idColumnTodo)
+        console.log(this.flagTodo)
       }
       this.flagFirst1 =true
       this.lengthTodo = newVal.length
@@ -149,8 +150,8 @@ export default {
     doingWatch: function(newVal, oldVal) {
       if(newVal.length > this.lengthDoing  && this.flagFirst2){
         this.flagTodo = this.idColumnDoing
-        console.log(this.taskMove.columnAdd)
-        console.log('start2')
+        console.log(this.idColumnDoing)
+        console.log(this.flagTodo)
       }
       this.flagFirst2=true;
       this.lengthDoing = newVal.length
@@ -158,7 +159,6 @@ export default {
     doneWatch: function(newVal, oldVal) {
       if(newVal.length > this.lengthDone  && this.flagFirst3){
         this.flagTodo = this.idColumnDone
-        console.log('start3')
       }
       this.flagFirst3 =true
       this.lengthDone = newVal.length
@@ -180,14 +180,12 @@ export default {
   methods: {
     ...mapActions("project", ["getProjectById"]),
     ...mapActions("task", ["getAllTask", "moveStatusTask"]),
-    log: function(evt) {
+     log: async function(evt) {
+       console.log(evt)
        if (evt["added"]){
         this.taskMove = evt['added']['element'];
         this.taskMove.projectId = this.uid;
         this.taskMove.columnAdd = this.flagTodo
-        console.log(this.taskMove.columnAdd)
-        console.log(this.flagSnapshot())
-        
         this.moveStatusTask(this.taskMove)
        }
     },
