@@ -141,8 +141,6 @@ export default {
     todoWatch: function(newVal, oldVal) {
       if(newVal.length > this.lengthTodo && this.flagFirst1){
         this.flagTodo = this.idColumnTodo
-        console.log(this.idColumnTodo)
-        console.log(this.flagTodo)
       }
       this.flagFirst1 =true
       this.lengthTodo = newVal.length
@@ -150,8 +148,6 @@ export default {
     doingWatch: function(newVal, oldVal) {
       if(newVal.length > this.lengthDoing  && this.flagFirst2){
         this.flagTodo = this.idColumnDoing
-        console.log(this.idColumnDoing)
-        console.log(this.flagTodo)
       }
       this.flagFirst2=true;
       this.lengthDoing = newVal.length
@@ -181,7 +177,6 @@ export default {
     ...mapActions("project", ["getProjectById"]),
     ...mapActions("task", ["getAllTask", "moveStatusTask"]),
      log: async function(evt) {
-       console.log(evt)
        if (evt["added"]){
         this.taskMove = evt['added']['element'];
         this.taskMove.projectId = this.uid;

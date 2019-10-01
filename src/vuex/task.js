@@ -39,7 +39,7 @@ export default {
     }
   },
   actions: {
-    async getAllTask({ commit,getters}, projectId) {
+    async getAllTask({ commit, getters }, projectId) {
       let taskTodo = []
       let taskDoing = []
       let taskDone = []
@@ -52,21 +52,22 @@ export default {
             response.forEach((item) => {
               if (item.data().idColumn === 0) {
                 commit('setIdColumnTodo', item.id)
-                  result1 = projectCollection.doc(projectId)
+                result1 = projectCollection.doc(projectId)
                   .collection('column').doc(item.id)
                   .collection('task').orderBy("createdAt", "asc").onSnapshot((snapshot) => {
                     snapshot.docChanges().forEach((task) => {
-                      let index =  getters.getTaskTodo.findIndex((x)=>x.id ===task.doc.id)
+                      let index = getters.getTaskTodo.findIndex((x) => x.id === task.doc.id)
                       if (task.type === 'added' && task.doc.data().nameTask && index === -1) {
                         taskTodo.push({
                           id: task.doc.id,
                           status: item.id,
                           ...task.doc.data(),
                         })
+                        console.log(taskTodo)
                       }
                       if (task.type === 'removed' && task.doc.data().nameTask) {
                         let index = getters.getTaskTodo.findIndex(item => item.id === task.doc.id)
-                        if(index !== -1){
+                        if (index !== -1) {
                           taskTodo.splice(index, 1)
                         }
                       }
@@ -79,8 +80,8 @@ export default {
                   .collection('column').doc(item.id)
                   .collection('task').orderBy("createdAt", "asc").onSnapshot((snapshot) => {
                     snapshot.docChanges().forEach((task) => {
-                      let index =  getters.getTaskDoing.findIndex((x)=>x.id ===task.doc.id)
-                      if (task.type === 'added' && task.doc.data().nameTask && index === -1) {    
+                      let index = getters.getTaskDoing.findIndex((x) => x.id === task.doc.id)
+                      if (task.type === 'added' && task.doc.data().nameTask && index === -1) {
                         taskDoing.push({
                           id: task.doc.id,
                           status: item.id,
@@ -88,13 +89,9 @@ export default {
                         })
                       }
                       if (task.type === 'removed' && task.doc.data().nameTask) {
-                        console.log(getters.getTaskDoing)
                         let index = getters.getTaskDoing.findIndex(item => item.id === task.doc.id)
-                        console.log(task)
-                        if(index !== -1){
+                        if (index !== -1) {
                           taskDoing.splice(index, 1)
-                          console.log(index)
-                          console.log(taskDoing)
                         }
                       }
                     })
@@ -106,7 +103,7 @@ export default {
                   .collection('column').doc(item.id)
                   .collection('task').orderBy("createdAt", "asc").onSnapshot((snapshot) => {
                     snapshot.docChanges().forEach((task) => {
-                      let index =  getters.getTaskDone.findIndex((x)=>x.id ===task.doc.id)
+                      let index = getters.getTaskDone.findIndex((x) => x.id === task.doc.id)
                       if (task.type === 'added' && task.doc.data().nameTask && index === -1) {
                         taskDone.push({
                           id: task.doc.id,
@@ -116,7 +113,7 @@ export default {
                       }
                       if (task.type === 'removed' && task.doc.data().nameTask) {
                         let index = getters.getTaskDone.findIndex(item => item.id === task.doc.id)
-                        if(index !== -1){
+                        if (index !== -1) {
                           taskDone.splice(index, 1)
                         }
                       }
@@ -127,7 +124,7 @@ export default {
           })
           .then(() => {
             commit('setAllTask', { taskTodo, taskDoing, taskDone });
-            resolve(result1,result2,result3);
+            resolve(result1, result2, result3);
           })
           .catch((error) => {
             console.log(error)
@@ -136,24 +133,27 @@ export default {
 
     },
     async moveStatusTask(context, task) {
-       let response = await projectCollection.doc(task.projectId)
-          .collection('column').doc(task.columnAdd)
-          .collection('task').doc(task.id).set({
-            createdAt : task.createdAt,
-            id: task.id,
-            nameTask : task.nameTask,
-            ownerTask: task.ownerTask,
-            projectId : task.projectId,
-            status : task.columnAdd
+      let response = await projectCollection.doc(task.projectId)
+        .collection('column').doc(task.columnAdd)
+        .collection('task').doc(task.id).set({
+          createdAt: task.createdAt,
+          id: task.id,
+          nameTask: task.nameTask,
+          ownerTask: task.ownerTask,
+          projectId: task.projectId,
+        })
+      if (task.status !== task.columnAdd) {
+        projectCollection.doc(task.projectId)
+          .collection('column').doc(task.status)
+          .collection('task').doc(task.id).delete()
+          .then((response) => {
           })
-          projectCollection.doc(task.projectId)
-              .collection('column').doc(task.status)
-              .collection('task').doc(task.id).delete()
-              .then((response) => {
-              })
-              .catch((error) => {
-                console.log(error)
-              })
+          .catch((error) => {
+            console.log(error)
+          })
+      }
+
+
     }
   }
 }
