@@ -1,8 +1,12 @@
 import Vue from 'vue';
 import Router from 'vue-router';
+import AuthLayout from '../layouts/Auth.vue';
 import CommonLayout from '@/layouts/Common.vue';
 import ProjectPage from '@/page/ProjectBoard.vue';
 import DetailProjectPage from '@/page/KanbanBoard.vue';
+import LoginPage from '../page/auth/Login.vue';
+import RegisterPage from '../page/auth/Register.vue';
+import NotFoundPage from '../page/error/404.vue';
 
 Vue.use(Router);
 
@@ -23,19 +27,33 @@ export const router = new Router({
         },
       ],
     },
+    {
+      path: '/',
+      component: AuthLayout,
+      children: [
+        { path: '', name: 'loginPage', component: LoginPage },
+        { path: '/register', name:"registerPage" , component: RegisterPage}
+      ],
+    },
+    {
+      path: '*',
+      component: NotFoundPage
+    }
   ],
 });
 
-// eslint-disable-next-line consistent-return
-// router.beforeEach((to, from, next) => {
-//   const publicPages = ['/'];
-//   const authRequired = !publicPages.includes(to.path);
-//   // kiem tra duong dan co duoc cho phep vao khong
-//   const loggedIn = localStorage.getItem('user');
 
-//   if (authRequired && !loggedIn) {
-//     return next('/');
-//   }
+router.beforeEach((to, from, next) => {
+  const publicPages = ['/'];
+  const authRequired = !publicPages.includes(to.path);
+  // kiem tra duong dan co duoc cho phep vao khong
+  const loggedIn = localStorage.getItem('user');
 
-//   next();
-// });
+  if (authRequired && !loggedIn) {
+    return next('/');
+  }
+  if(to.path ==='/' && loggedIn){
+    return next('/board');
+  }
+  next();
+});

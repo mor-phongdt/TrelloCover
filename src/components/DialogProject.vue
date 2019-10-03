@@ -35,6 +35,50 @@
               </v-btn>
             </v-btn-toggle>
           </div>
+          <v-autocomplete
+            v-model="selectedMembers"
+            :items="members"
+            filled
+            dark
+            class="mt-2 ml-5 mr-5"
+            :loading="isLoading"
+            :search-input.sync="search"
+            background-color="rgba(0,0,0,.4)"
+            placeholder="Add Member ..."
+            outlined
+            item-text="fullName"
+            item-value="id"
+            multiple
+          >
+            <template v-slot:selection="data">
+              <v-chip
+                v-bind="data.attrs"
+                :input-value="data.selected"
+                close
+                @click="data.select"
+                @click:close="remove(data.item)"
+                class="list-singer"
+              >
+                <v-avatar left>
+                  <v-img :src="data.item.AvatarUrl"></v-img>
+                </v-avatar>
+                {{ data.item.FullName }}
+              </v-chip>
+            </template>
+            <template v-slot:item="data">
+              <template v-if="typeof data.item !== 'object'">
+                <v-list-item-content v-text="data.item"></v-list-item-content>
+              </template>
+              <template v-else>
+                <v-list-item-avatar>
+                  <img :src="data.item.AvatarUrl" />
+                </v-list-item-avatar>
+                <v-list-item-content>
+                  <v-list-item-title v-html="data.item.FullName"></v-list-item-title>
+                </v-list-item-content>
+              </template>
+            </template>
+          </v-autocomplete>
           <v-textarea
             class="mt-2 ml-5 mr-5"
             placeholder="Description"
@@ -71,7 +115,11 @@ export default {
         "https://images.unsplash.com/photo-1502481851512-e9e2529bfbf9?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1050&q=80",
         "https://images.unsplash.com/photo-1419242902214-272b3f66ee7a?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1087&q=80",
         "https://images.unsplash.com/photo-1488866022504-f2584929ca5f?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1043&q=80"
-      ]
+      ],
+      members: [],
+      selectedMembers: [],
+      search: null,
+      isLoading: false
     };
   },
   created() {
@@ -89,6 +137,19 @@ export default {
   watch: {
     toggle_exclusive() {
       this.background = "url(" + this.toggle_exclusive + ")";
+    },
+    search(val) {
+      if (this.members.length > 0) return
+
+        this.isLoading = true
+        this.getListUser()
+          .then(res => {
+            this.items = res.data
+          })
+          .catch(err => {
+            console.log(err)
+          })
+          .finally(() => (this.isLoading = false))
     }
   },
   methods: {

@@ -88,7 +88,8 @@ export default {
       flagFirst1 : false,
       flagFirst2 : false,
       flagFirst3 : false,
-      flagTodo:'',
+      flagAddColumn:'',
+      flagStatus: '',
       flagSnapshot: undefined,
     };
   },
@@ -140,21 +141,30 @@ export default {
   watch: {
     todoWatch: function(newVal, oldVal) {
       if(newVal.length > this.lengthTodo && this.flagFirst1){
-        this.flagTodo = this.idColumnTodo
+        this.flagAddColumn = this.idColumnTodo
+      }
+      if(newVal.length < this.lengthTodo && this.flagFirst1){
+        this.flagStatus = this.idColumnTodo
       }
       this.flagFirst1 =true
       this.lengthTodo = newVal.length
     },
     doingWatch: function(newVal, oldVal) {
       if(newVal.length > this.lengthDoing  && this.flagFirst2){
-        this.flagTodo = this.idColumnDoing
+        this.flagAddColumn = this.idColumnDoing
+      }
+      if(newVal.length < this.lengthDoing  && this.flagFirst2){
+        this.flagStatus = this.idColumnDoing
       }
       this.flagFirst2=true;
       this.lengthDoing = newVal.length
     },
     doneWatch: function(newVal, oldVal) {
       if(newVal.length > this.lengthDone  && this.flagFirst3){
-        this.flagTodo = this.idColumnDone
+        this.flagAddColumn = this.idColumnDone
+      }
+      if(newVal.length < this.lengthDone  && this.flagFirst3){
+        this.flagStatus = this.idColumnDone
       }
       this.flagFirst3 =true
       this.lengthDone = newVal.length
@@ -180,7 +190,8 @@ export default {
        if (evt["added"]){
         this.taskMove = evt['added']['element'];
         this.taskMove.projectId = this.uid;
-        this.taskMove.columnAdd = this.flagTodo
+        this.taskMove.columnAdd = this.flagAddColumn
+        this.taskMove.status = this.flagStatus
         this.moveStatusTask(this.taskMove)
        }
     },

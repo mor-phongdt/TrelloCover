@@ -60,10 +60,8 @@ export default {
                       if (task.type === 'added' && task.doc.data().nameTask && index === -1) {
                         taskTodo.push({
                           id: task.doc.id,
-                          status: item.id,
                           ...task.doc.data(),
                         })
-                        console.log(taskTodo)
                       }
                       if (task.type === 'removed' && task.doc.data().nameTask) {
                         let index = getters.getTaskTodo.findIndex(item => item.id === task.doc.id)
@@ -84,7 +82,6 @@ export default {
                       if (task.type === 'added' && task.doc.data().nameTask && index === -1) {
                         taskDoing.push({
                           id: task.doc.id,
-                          status: item.id,
                           ...task.doc.data(),
                         })
                       }
@@ -107,7 +104,6 @@ export default {
                       if (task.type === 'added' && task.doc.data().nameTask && index === -1) {
                         taskDone.push({
                           id: task.doc.id,
-                          status: item.id,
                           ...task.doc.data(),
                         })
                       }

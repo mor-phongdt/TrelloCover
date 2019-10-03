@@ -1,9 +1,5 @@
-import Vue from 'vue';
-import axios from 'axios';
-import VueAxios from 'vue-axios';
-
-Vue.use(VueAxios, axios);
-
+import { firebase } from '@/plugins/firebase';
+import { reject } from 'q';
 
 export default {
   namespaced: true,
@@ -26,19 +22,44 @@ export default {
   },
   actions: {
     async login({ commit }, user) {
-      const result = await axios.post('http://jsonplaceholder.typicode.com/users', {
-        id: user.id,
-        password: user.password,
-      });
-      if (result) {
-        localStorage.setItem('user', JSON.stringify(user));
-        commit('setLogin', user);
-      }
+      return new Promise((resolve, reject) => {
+        firebase.auth().signInWithEmailAndPassword(user.email, user.password)
+          .then((loginResult) => {
+            if (loginResult.user.emailVerified) {
+              console.log(loginResult)
+              localStorage.setItem('user', JSON.stringify(loginResult.user.refreshToken));
+              commit('setLogin', user);
+              resolve()
+            } else {
+              console.log('This account is not activate . Please verify')
+            }
+          })
+          .catch((error) => {
+            window.alert(error.message);
+          })
+      })
     },
     async logout({ commit }) {
-      await localStorage.removeItem('user');
+      localStorage.removeItem('user');
       commit('setLogout');
     },
+    async register(context, user) {
+      console.log(user)
+      return new Promise((resolve, rejcet) => {
+        firebase.auth().createUserWithEmailAndPassword(user.email, user.password)
+          .then((registerResult) => {
+            console.log(registerResult)
+            registerResult.user.updateProfile({
+              displayName: user.fullName,
+            });
+            registerResult.user.sendEmailVerification();
+            resolve()
+          })
+          .catch((error) => {
+            console.log(error)
+          });
+      })
+    }
   },
 
 };

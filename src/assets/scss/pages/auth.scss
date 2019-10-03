@@ -1,0 +1,32 @@
+.login-container {
+    height: 100%;
+    background: #1b1d1f;
+    // background-image: url(https://www.vuemastery.com/images/hero-1.svg);
+      height: 100vh;
+      background-size: cover;
+  }
+  .login-container .form--grid__login {
+    display: grid !important;
+    grid-template-columns: 30% 70%;
+    background-image: url(https://cdn.lynda.com/course/704138/704138-636987819971354178-16x9.jpg);
+    background-size: cover;
+    background-position: 0%;
+  }
+  .login-container .form--grid__login .form__login-container {
+    background :linear-gradient(245deg, #2d3238 107%, #1f2022 191%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .color {
+    color: white !important;
+  }
+  .login-container .form--grid__login .form__login-container .input--wrapper {
+    width: 100%;
+  }
+  // .login-container .form {
+  //   border: 1px solid linear-gradient(135deg,#41b883,#4a9cee);
+  //   border-radius: 20px;
+  // }
+ 

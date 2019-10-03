@@ -53,6 +53,8 @@
 </template>
 
 <script>
+import { mapActions } from 'vuex';
+
 export default {
   data() {
     return {
@@ -64,5 +66,16 @@ export default {
       mini: true,
     };
   },
+   methods: {
+    ...mapActions('auth', {
+      logout: 'logout',
+    }),
+    logoutEvent() {
+      this.logout();
+       this.$router.push({
+            name: 'loginPage',
+          });
+    },
+  }
 };
 </script>
