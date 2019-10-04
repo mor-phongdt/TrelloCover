@@ -15,13 +15,14 @@ if (!firebase.apps.length) {
     });
 }
 const db = firebase.firestore();
-
+const userCollection = db.collection('users')
 const projectCollection = db.collection('Project')
 
 
 export {
     firebase,
-    projectCollection
+    projectCollection,
+    userCollection
 }
 
 

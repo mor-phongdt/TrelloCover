@@ -1,4 +1,4 @@
-import { firebase } from '@/plugins/firebase';
+import { firebase,userCollection } from '@/plugins/firebase';
 import { reject } from 'q';
 
 export default {
@@ -26,9 +26,9 @@ export default {
         firebase.auth().signInWithEmailAndPassword(user.email, user.password)
           .then((loginResult) => {
             if (loginResult.user.emailVerified) {
-              console.log(loginResult)
               localStorage.setItem('user', JSON.stringify(loginResult.user.refreshToken));
-              commit('setLogin', user);
+              localStorage.setItem('email',JSON.stringify(loginResult.user.email))
+              commit('setLogin', user.email);
               resolve()
             } else {
               console.log('This account is not activate . Please verify')
@@ -41,19 +41,27 @@ export default {
     },
     async logout({ commit }) {
       localStorage.removeItem('user');
+      localStorage.removeItem('email')
       commit('setLogout');
     },
     async register(context, user) {
-      console.log(user)
       return new Promise((resolve, rejcet) => {
         firebase.auth().createUserWithEmailAndPassword(user.email, user.password)
           .then((registerResult) => {
-            console.log(registerResult)
             registerResult.user.updateProfile({
               displayName: user.fullName,
             });
-            registerResult.user.sendEmailVerification();
-            resolve()
+            userCollection.doc(registerResult.user.uid).set({
+              email : user.email,
+              fullName : user.fullName
+            })
+            .then(()=>{
+              registerResult.user.sendEmailVerification();
+              resolve()
+            })
+            .catch((error)=>{
+              console.log(error)
+            })  
           })
           .catch((error) => {
             console.log(error)

@@ -44,7 +44,7 @@ export const router = new Router({
 
 
 router.beforeEach((to, from, next) => {
-  const publicPages = ['/'];
+  const publicPages = ['/','/register'];
   const authRequired = !publicPages.includes(to.path);
   // kiem tra duong dan co duoc cho phep vao khong
   const loggedIn = localStorage.getItem('user');

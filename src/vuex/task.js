@@ -60,6 +60,7 @@ export default {
                       if (task.type === 'added' && task.doc.data().nameTask && index === -1) {
                         taskTodo.push({
                           id: task.doc.id,
+                          status: item.id,
                           ...task.doc.data(),
                         })
                       }
@@ -82,6 +83,7 @@ export default {
                       if (task.type === 'added' && task.doc.data().nameTask && index === -1) {
                         taskDoing.push({
                           id: task.doc.id,
+                          status: item.id,
                           ...task.doc.data(),
                         })
                       }
@@ -104,6 +106,7 @@ export default {
                       if (task.type === 'added' && task.doc.data().nameTask && index === -1) {
                         taskDone.push({
                           id: task.doc.id,
+                          status: item.id,
                           ...task.doc.data(),
                         })
                       }
@@ -150,6 +153,31 @@ export default {
       }
 
 
+    },
+    addTask(context, task) {
+      console.log(task)
+      return new Promise((resolve,reject)=>{
+        projectCollection.doc(task.projectId)
+        .collection('column').doc(task.status)
+        .collection('task').add(task)
+        .then(()=>{
+          resolve()
+        })
+        .catch((error)=>{
+          reject(error)
+        })
+      })
+    },
+    async deleteTask(context, task) {
+      console.log(task)
+      projectCollection.doc(task.projectId)
+        .collection('column').doc(task.status)
+        .collection('task').doc(task.id).delete()
+        .then((response) => {
+        })
+        .catch((error) => {
+          console.log(error)
+        })
     }
   }
 }

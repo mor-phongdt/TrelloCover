@@ -47,7 +47,7 @@
             placeholder="Add Member ..."
             outlined
             item-text="fullName"
-            item-value="id"
+            item-value="email"
             multiple
           >
             <template v-slot:selection="data">
@@ -60,9 +60,9 @@
                 class="list-singer"
               >
                 <v-avatar left>
-                  <v-img :src="data.item.AvatarUrl"></v-img>
+                  <v-img src="https://image.shutterstock.com/image-vector/blank-avatar-photo-placeholder-flat-260nw-1151124605.jpg"></v-img>
                 </v-avatar>
-                {{ data.item.FullName }}
+                {{ data.item.fullName }}
               </v-chip>
             </template>
             <template v-slot:item="data">
@@ -71,10 +71,11 @@
               </template>
               <template v-else>
                 <v-list-item-avatar>
-                  <img :src="data.item.AvatarUrl" />
+                  <img src="https://image.shutterstock.com/image-vector/blank-avatar-photo-placeholder-flat-260nw-1151124605.jpg" />
                 </v-list-item-avatar>
                 <v-list-item-content>
-                  <v-list-item-title v-html="data.item.FullName"></v-list-item-title>
+                  <v-list-item-title v-html="data.item.fullName"></v-list-item-title>
+                  <v-list-item-subtitle v-html="data.item.email"></v-list-item-subtitle>
                 </v-list-item-content>
               </template>
             </template>
@@ -99,7 +100,7 @@
 </template>
 
 <script>
-import { mapActions } from "vuex";
+import { mapActions,mapGetters } from "vuex";
 
 export default {
   data() {
@@ -133,6 +134,7 @@ export default {
         }
       }
     );
+    this.selectedMembers = [JSON.parse(localStorage.getItem('email'))]
   },
   watch: {
     toggle_exclusive() {
@@ -143,8 +145,10 @@ export default {
 
         this.isLoading = true
         this.getListUser()
-          .then(res => {
-            this.items = res.data
+          .then(() => {
+            let index = this.getAllListUser.findIndex((item)=>{ return item.email !== JSON.parse(localStorage.getItem('email'))})
+            this.getAllListUser.splice(index,1);
+            this.members = this.getAllListUser
           })
           .catch(err => {
             console.log(err)
@@ -152,18 +156,21 @@ export default {
           .finally(() => (this.isLoading = false))
     }
   },
+  computed : {
+    ...mapGetters('project',['getAllListUser'])
+  },
   methods: {
-    ...mapActions("project", ["createProject"]),
+    ...mapActions("project", ["createProject","getListUser"]),
     submit() {
       this.$validator.validateAll().then(result => {
         if (result) {
           const loader = this.$loading.show();
           this.createProject({
-            owner: "abc",
+            owner: JSON.parse(localStorage.getItem('email')),
             nameProject: this.nameProject,
             contentProject: this.decription,
             createdAt: new Date(),
-            members: [],
+            members: this.selectedMembers,
             themeProject: this.background
           }).then(() => {
             loader.hide();
@@ -177,7 +184,13 @@ export default {
     cancel() {
       this.$validator.reset();
       this.$store.commit("closeDialog");
-    }
+    },
+    remove(item) {
+      const index = this.selectedMembers.indexOf(item.id);
+      if (index >= 0) {
+        this.selectedMembers.splice(index, 1);
+      }
+    },
   }
 };
 </script>
