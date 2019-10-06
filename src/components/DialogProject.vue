@@ -47,7 +47,7 @@
             placeholder="Add Member ..."
             outlined
             item-text="fullName"
-            item-value="email"
+            return-object
             multiple
           >
             <template v-slot:selection="data">
@@ -134,7 +134,7 @@ export default {
         }
       }
     );
-    this.selectedMembers = [JSON.parse(localStorage.getItem('email'))]
+    this.selectedMembers = [JSON.parse(localStorage.getItem('account'))]
   },
   watch: {
     toggle_exclusive() {
@@ -146,7 +146,7 @@ export default {
         this.isLoading = true
         this.getListUser()
           .then(() => {
-            let index = this.getAllListUser.findIndex((item)=>{ return item.email !== JSON.parse(localStorage.getItem('email'))})
+            let index = this.getAllListUser.findIndex((item)=>{ return item.email !== JSON.parse(localStorage.getItem('account')).email})
             this.getAllListUser.splice(index,1);
             this.members = this.getAllListUser
           })
@@ -186,7 +186,7 @@ export default {
       this.$store.commit("closeDialog");
     },
     remove(item) {
-      const index = this.selectedMembers.indexOf(item.id);
+      const index = this.selectedMembers.indexOf(item.email);
       if (index >= 0) {
         this.selectedMembers.splice(index, 1);
       }

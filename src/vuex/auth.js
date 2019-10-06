@@ -1,5 +1,4 @@
 import { firebase,userCollection } from '@/plugins/firebase';
-import { reject } from 'q';
 
 export default {
   namespaced: true,
@@ -25,9 +24,10 @@ export default {
       return new Promise((resolve, reject) => {
         firebase.auth().signInWithEmailAndPassword(user.email, user.password)
           .then((loginResult) => {
+            console.log(loginResult.user)
             if (loginResult.user.emailVerified) {
               localStorage.setItem('user', JSON.stringify(loginResult.user.refreshToken));
-              localStorage.setItem('email',JSON.stringify(loginResult.user.email))
+              localStorage.setItem('account',JSON.stringify({email:loginResult.user.email, fullName:loginResult.user.displayName, avatarUrl:loginResult.user.photoURL, id:loginResult.user.uid}))
               commit('setLogin', user.email);
               resolve()
             } else {

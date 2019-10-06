@@ -1,63 +1,69 @@
 <template>
-  <div class="d-flex content" :style="{backgroundImage:background}">
-    <v-card
-      class="list-column"
-      v-for="column in columns"
-      :key="column.id"
-      elevation="24"
-      color="rgba(0,0,0,.4)"
-      width="300px"
-    >
-      <v-app-bar dark color="rgba(0,0,0,.4)" width="300px">
-        <v-toolbar-title>{{column.name}}</v-toolbar-title>
-      </v-app-bar>
-      <v-container class="pa-2" fluid>
-        <draggable :list="column.items" group="people" @change="log">
-          <v-col v-for="(item, i) in column.items" :key="i">
-            <v-card color="secondary" dark>
-              <v-btn icon @click="remove(item,column)" style="float:right">
-                <v-icon>mdi-close-circle</v-icon>
-              </v-btn>
-              <v-list-item three-line>
-                <v-list-item-content class="align-self-start">
-                  <div>{{item.nameTask}}</div>
-                </v-list-item-content>
-              </v-list-item>
-            </v-card>
-          </v-col>
-        </draggable>
-        <v-text-field
-          v-if="column.addTask"
-          v-model="column.model"
-          class="pa-3"
-          label="Solo"
-          placeholder="Type title..."
-          @keyup.enter="submit(column)"
-          solo
-        ></v-text-field>
-        <div class="pa-2">
-          <v-btn block color="#e6e6e6" class="color" @click="column.addTask=true">
-            <v-icon>mdi-plus</v-icon>
-          </v-btn>
-        </div>
-      </v-container>
-    </v-card>
+  <div style="height:100%">
+    <DialogTask :selectTask='seclectTask'/>
+    <div class="d-flex content height__screenTask" :style="{backgroundImage:background}">
+      <v-card
+        class="list-column"
+        v-for="column in columns"
+        :key="column.id"
+        elevation="24"
+        color="rgba(0,0,0,.4)"
+        width="300px"
+      >
+        <v-app-bar dark color="rgba(0,0,0,.4)" width="300px">
+          <v-toolbar-title>{{column.name}}</v-toolbar-title>
+        </v-app-bar>
+        <v-container class="pa-2" fluid>
+          <draggable :list="column.items" group="people" @change="log">
+            <v-col v-for="(item, i) in column.items" :key="i">
+              <v-card color="secondary" dark @click='goToTaskDetail(item)'>
+                <v-btn icon @click="remove(item,column)" style="float:right">
+                  <v-icon>mdi-close-circle</v-icon>
+                </v-btn>
+                <v-list-item three-line>
+                  <v-list-item-content class="align-self-start">
+                    <div>{{item.nameTask}}</div>
+                  </v-list-item-content>
+                </v-list-item>
+              </v-card>
+            </v-col>
+          </draggable>
+          <v-text-field
+            v-if="column.addTask"
+            v-model="column.model"
+            class="pa-3"
+            label="Solo"
+            placeholder="Type title..."
+            @keyup.enter="submit(column)"
+            solo
+          ></v-text-field>
+          <div class="pa-2">
+            <v-btn block color="#e6e6e6" class="color" @click="column.addTask=true">
+              <v-icon>mdi-plus</v-icon>
+            </v-btn>
+          </div>
+        </v-container>
+      </v-card>
+    </div>
   </div>
 </template>
 
 <script>
+import DialogTask from "@/components/DialogTask.vue";
 import { projectCollection } from "@/plugins/firebase";
 import draggable from "vuedraggable";
 import { mapActions, mapGetters } from "vuex";
 
 export default {
   components: {
-    draggable
+    draggable,
+    DialogTask
   },
   data() {
     return {
       projectId: "",
       background: "",
+      seclectTask: '',
       columns: [
         {
           id: 0,
@@ -199,6 +205,10 @@ export default {
       "deleteTask",
       "addTask"
     ]),
+    goToTaskDetail(item) {
+      this.seclectTask = item
+      this.$store.commit("showDialog");
+    },
     log: async function(evt) {
       if (evt["added"]) {
         this.taskMove = evt["added"]["element"];
@@ -215,13 +225,13 @@ export default {
         projectId: this.projectId,
         status: column.idDynamic,
         ownerTask: JSON.parse(localStorage.getItem("email"))
-      }).then(() => {
       })
-      .catch((error)=>{
-        console.log(error)
-      })
-      this.columns[column.id].model = ''
-        this.columns[column.id].addTask = !this.columns[column.id].addTask;
+        .then(() => {})
+        .catch(error => {
+          console.log(error);
+        });
+      this.columns[column.id].model = "";
+      this.columns[column.id].addTask = !this.columns[column.id].addTask;
     },
     remove(item) {
       this.deleteTask(item);

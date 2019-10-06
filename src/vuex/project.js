@@ -33,7 +33,7 @@ export default {
     async getAllProject({ commit }) {
         let listProjects =[]
         return new Promise((resolve, reject) => {
-          let response = projectCollection.where("members", "array-contains", JSON.parse(localStorage.getItem('email'))).onSnapshot((snapshot)=>{ 
+          let response = projectCollection.where("members", "array-contains", JSON.parse(localStorage.getItem('account')).email).onSnapshot((snapshot)=>{ 
               snapshot.docChanges().forEach((item)=>{
                 if(item.type==='added'){
                     listProjects.push({
