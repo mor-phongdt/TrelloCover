@@ -17,7 +17,7 @@
             background-color="rgba(0,0,0,.4)"
             placeholder="Asignee to ..."
             item-text="fullName"
-            item-value="email"
+            return-object
           >
             <template v-slot:selection="data">
               <v-chip

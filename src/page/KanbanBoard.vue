@@ -224,7 +224,7 @@ export default {
         createdAt: new Date(),
         projectId: this.projectId,
         status: column.idDynamic,
-        ownerTask: JSON.parse(localStorage.getItem("email"))
+        ownerTask: JSON.parse(localStorage.getItem("account"))
       })
         .then(() => {})
         .catch(error => {
