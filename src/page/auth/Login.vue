@@ -60,14 +60,19 @@ export default {
         })
           .then(() => {
             this.$validator.reset();
+            this.$store.commit("setSnack", {
+              snack: "login completed!",
+              color: "#40b883"
+            });
             this.$router.push({ name: "ProjectPage" });
             loader.hide();
           })
           .catch(err => {
-            // this.$store.commit("setSnack", {
-            //   snack: err.message,
-            //   color: "error"
-            // });
+            loader.hide()
+            this.$store.commit("setSnack", {
+              snack: err.message,
+              color: "#ff5252"
+            });
           });
       }
     }

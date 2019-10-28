@@ -1,12 +1,18 @@
 <template>
   <div id="app">
+    <Snackbar/>
     <router-view />
   </div>
 </template>
 
 <script>
+import Snackbar from './components/SnakBar';
+
 export default {
-  name: "App"
+  name: "App",
+  components: {
+    Snackbar,
+  },
 };
 </script>
 

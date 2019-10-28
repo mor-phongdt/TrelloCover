@@ -1,4 +1,4 @@
-<template>
+<template >
   <div style="height:100%">
     <DialogTask :selectTask='seclectTask'/>
     <div class="d-flex content height__screenTask" :style="{backgroundImage:background}">
@@ -49,10 +49,10 @@
 </template>
 
 <script>
-import DialogTask from "@/components/DialogTask.vue";
-import { projectCollection } from "@/plugins/firebase";
-import draggable from "vuedraggable";
-import { mapActions, mapGetters } from "vuex";
+import DialogTask from "@/components/DialogTask.vue"
+import { projectCollection } from "@/plugins/firebase"
+import draggable from "vuedraggable"
+import { mapActions, mapGetters } from "vuex"
 
 export default {
   components: {
@@ -63,7 +63,8 @@ export default {
     return {
       projectId: "",
       background: "",
-      seclectTask: '',
+      seclectTask: {},
+      members:[],
       columns: [
         {
           id: 0,
@@ -100,101 +101,117 @@ export default {
       flagFirst3: false,
       flagAddColumn: "",
       flagStatus: "",
-      flagSnapshot: undefined
-    };
+      flagSnapshot: undefined,
+      key:0
+    }
   },
   created() {
-    const loader = this.$loading.show();
-    this.uid = this.$route.params.id;
+    const loader = this.$loading.show()
+    this.uid = this.$route.params.id
     this.getProjectById(this.uid)
       .then(() => {
-        this.background = this.projectDetail.themeProject;
-        this.projectId = this.projectDetail.id;
+        this.background = this.projectDetail.themeProject
+        this.projectId = this.projectDetail.id
         this.getAllTask(this.uid).then(value => {
-          this.idColumnTodo = this.$store.state.task.idColumnTodo;
-          this.idColumnDoing = this.$store.state.task.idColumnDoing;
-          this.idColumnDone = this.$store.state.task.idColumnDone;
-          this.columns[0].idDynamic = this.$store.state.task.idColumnTodo;
-          this.columns[1].idDynamic = this.$store.state.task.idColumnDoing;
-          this.columns[2].idDynamic = this.$store.state.task.idColumnDone;
-          this.flagSnapshot = value;
+          this.idColumnTodo = this.$store.state.task.idColumnTodo
+          this.idColumnDoing = this.$store.state.task.idColumnDoing
+          this.idColumnDone = this.$store.state.task.idColumnDone
+          this.columns[0].idDynamic = this.$store.state.task.idColumnTodo
+          this.columns[1].idDynamic = this.$store.state.task.idColumnDoing
+          this.columns[2].idDynamic = this.$store.state.task.idColumnDone
+          this.flagSnapshot = value
           this.$store.watch(
             state => state.task.taskTodo,
             () => {
-              const msg = this.$store.state.task.taskTodo;
+              const msg = this.$store.state.task.taskTodo
               if (msg !== "") {
-                this.columns[0].items = msg;
+                this.columns[0].items = msg
               }
             }
-          );
+          )
           this.$store.watch(
             state => state.task.taskDoing,
             () => {
-              const msg = this.$store.state.task.taskDoing;
+              const msg = this.$store.state.task.taskDoing
               if (msg !== "") {
-                this.columns[1].items = msg;
+                this.columns[1].items = msg
               }
             }
-          );
+          )
           this.$store.watch(
             state => state.task.taskDone,
             () => {
-              const msg = this.$store.state.task.taskDone;
+              const msg = this.$store.state.task.taskDone
               if (msg !== "") {
-                this.columns[2].items = msg;
+                this.columns[2].items = msg
               }
             }
-          );
-        });
-        loader.hide();
+          )
+        })
+        this.getMembers(this.uid)
+        .then(() => {
+          this.members = this.getMembersProject
+          loader.hide()
+        })
+        .catch(error => {
+          loader.hide()
+          this.$store.commit("setSnack", {
+              snack: "Something went wrong, please try again later!",
+              color: "#ff5252"
+            })
+            this.$router.push({ name: "ProjectPage" })
+      })
       })
       .catch(error => {
-        console.log(error.message);
-      });
+        this.$store.commit("setSnack", {
+              snack: "Something went wrong, please try again later!",
+              color: "#ff5252"
+            })
+      })
   },
   watch: {
     todoWatch: function(newVal, oldVal) {
       if (newVal.length > this.lengthTodo) {
-        this.flagAddColumn = this.idColumnTodo;
+        this.flagAddColumn = this.idColumnTodo
       }
       if (newVal.length < this.lengthTodo && this.flagFirst1) {
-        this.flagStatus = this.idColumnTodo;
+        this.flagStatus = this.idColumnTodo
       }
-      this.flagFirst1 = true;
-      this.lengthTodo = newVal.length;
+      this.flagFirst1 = true
+      this.lengthTodo = newVal.length
     },
     doingWatch: function(newVal, oldVal) {
       if (newVal.length > this.lengthDoing) {
-        this.flagAddColumn = this.idColumnDoing;
+        this.flagAddColumn = this.idColumnDoing
       }
       if (newVal.length < this.lengthDoing && this.flagFirst2) {
-        this.flagStatus = this.idColumnDoing;
+        this.flagStatus = this.idColumnDoing
       }
-      this.flagFirst2 = true;
-      this.lengthDoing = newVal.length;
+      this.flagFirst2 = true
+      this.lengthDoing = newVal.length
     },
     doneWatch: function(newVal, oldVal) {
       if (newVal.length > this.lengthDone) {
-        this.flagAddColumn = this.idColumnDone;
+        this.flagAddColumn = this.idColumnDone
       }
       if (newVal.length < this.lengthDone && this.flagFirst3) {
-        this.flagStatus = this.idColumnDone;
+        this.flagStatus = this.idColumnDone
       }
-      this.flagFirst3 = true;
-      this.lengthDone = newVal.length;
+      this.flagFirst3 = true
+      this.lengthDone = newVal.length
     }
   },
   computed: {
     ...mapGetters("project", ["projectDetail"]),
-    ...mapGetters("task", ["getTaskTodo", "getTaskDoing", "getTaskDone"]),
+    ...mapGetters("task", ["getTaskTodo", "getTaskDoing", "getTaskDone", "getMembersProject"]),
     todoWatch() {
-      return this.columns[0].items;
+      return this.columns[0].items
     },
     doingWatch() {
-      return this.columns[1].items;
+      return this.columns[1].items
     },
     doneWatch() {
-      return this.columns[2].items;
+      return this.columns[2].items
     }
   },
   methods: {
@@ -203,19 +220,23 @@ export default {
       "getAllTask",
       "moveStatusTask",
       "deleteTask",
-      "addTask"
+      "addTask",
+      "getMembers"
     ]),
     goToTaskDetail(item) {
-      this.seclectTask = item
-      this.$store.commit("showDialog");
+      this.seclectTask = {
+        ...item,
+        members: this.members
+      }
+      this.$store.commit("showDialog")
     },
     log: async function(evt) {
       if (evt["added"]) {
-        this.taskMove = evt["added"]["element"];
-        this.taskMove.projectId = this.uid;
-        this.taskMove.columnAdd = this.flagAddColumn;
-        this.taskMove.status = this.flagStatus;
-        this.moveStatusTask(this.taskMove);
+        this.taskMove = evt["added"]["element"]
+        this.taskMove.projectId = this.uid
+        this.taskMove.columnAdd = this.flagAddColumn
+        this.taskMove.status = this.flagStatus
+        this.moveStatusTask(this.taskMove)
       }
     },
     submit(column) {
@@ -224,18 +245,28 @@ export default {
         createdAt: new Date(),
         projectId: this.projectId,
         status: column.idDynamic,
-        ownerTask: JSON.parse(localStorage.getItem("account"))
+        ownerTask: JSON.parse(localStorage.getItem("id"))
       })
         .then(() => {})
         .catch(error => {
-          console.log(error);
-        });
-      this.columns[column.id].model = "";
-      this.columns[column.id].addTask = !this.columns[column.id].addTask;
+          console.log(error)
+        })
+      this.columns[column.id].model = ""
+      this.columns[column.id].addTask = !this.columns[column.id].addTask
     },
     remove(item) {
-      this.deleteTask(item);
+      let loader = this.$loading.show();
+      this.deleteTask(item)
+      .then(()=>{
+        loader.hide()
+      })
+      .catch(err => {
+        this.$store.commit("setSnack", {
+              snack: "Something went wrong, please try again later!",
+              color: "#ff5252"
+            })
+      })
     }
   }
-};
+}
 </script>

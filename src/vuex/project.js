@@ -31,23 +31,40 @@ export default {
   },
   actions: {
     async getAllProject({ commit }) {
+      let userList = []
+      let p1 = await userCollection.get()
+      if (p1) {
+        p1.forEach(item => {
+          userList.push({
+            id: item.id,
+          ...item.data()
+          })
+        })
+      }
         let listProjects =[]
         return new Promise((resolve, reject) => {
-          let response = projectCollection.where("members", "array-contains", JSON.parse(localStorage.getItem('account')).email).onSnapshot((snapshot)=>{ 
+          let response = projectCollection.where("members", "array-contains", JSON.parse(localStorage.getItem('id'))).onSnapshot((snapshot)=>{ 
               snapshot.docChanges().forEach((item)=>{
                 if(item.type==='added'){
-                    listProjects.push({
+                    let owner = userList.find((x) => x.id === item.doc.data().owner)
+                    if(owner) {
+                      listProjects.push({
                         id: item.doc.id,
-                        ...item.doc.data(),
+                        owner: owner,
+                        contentProject: item.doc.data().contentProject,
+                        nameProject : item.doc.data().nameProject,
+                        members: item.doc.data().members,
+                        themeProject: item.doc.data().themeProject
                     }) 
+                    }
                 }
                 if(item.type === 'removed') {
-                   let index = listProjects.findIndex((project)=>{ return item.doc.id===project.id})
+                    let index = listProjects.findIndex((project)=>{ return item.doc.id===project.id})
                     listProjects.splice(index,1);
                 }
               })
-         });
-         if(response){
+        });
+        if(response){
           commit('setListProject',listProjects);
           resolve()
         }
@@ -60,6 +77,7 @@ export default {
           commit('setProject',{id:projectId,...response.data()})
         }
         }catch(error){
+          rejcet(error)
           console.log(error)
         }
     },
@@ -70,6 +88,7 @@ export default {
             projectCollection.doc(response.id).collection('column').add({name:'Doing',idColumn:1})
             projectCollection.doc(response.id).collection('column').add({name:'Done',idColumn:2})
         }catch(error){
+          rejcet(error)
             console.log(error)
         }
     },
@@ -78,7 +97,8 @@ export default {
             const response = projectCollection.doc(projectId).delete();
 
         }catch(error) {
-            console.log(error)
+          rejcet(error)
+          console.log(error)
         }
     },
     async getListUser({commit}) {

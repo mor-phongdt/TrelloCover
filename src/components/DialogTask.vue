@@ -8,16 +8,16 @@
           </v-card-title>
           <v-autocomplete
             v-model="asignee"
-            :items="members"
+            :items="selectTask.members"
             filled
             outlined
             dark
-            style="width:40%"
+            style="width:60%"
             class="mt-2 ml-5 mr-5"
             background-color="rgba(0,0,0,.4)"
             placeholder="Asignee to ..."
             item-text="fullName"
-            return-object
+            item-value="id"
           >
             <template v-slot:selection="data">
               <v-chip
@@ -29,7 +29,7 @@
               >
                 <v-avatar left>
                   <v-img
-                    src="https://image.shutterstock.com/image-vector/blank-avatar-photo-placeholder-flat-260nw-1151124605.jpg"
+                    :src="data.item.avatarUrl"
                   ></v-img>
                 </v-avatar>
                 {{ data.item.fullName }}
@@ -42,7 +42,7 @@
               <template v-else>
                 <v-list-item-avatar>
                   <img
-                    src="https://image.shutterstock.com/image-vector/blank-avatar-photo-placeholder-flat-260nw-1151124605.jpg"
+                    :src="data.item.avatarUrl"
                   />
                 </v-list-item-avatar>
                 <v-list-item-content>
@@ -60,11 +60,24 @@
             outlined
             auto-grow
             dark
+            @keyup.enter="submit()"
+            required
           />
+          <v-divider class="mx-4" />
+          <v-spacer></v-spacer>
+          <v-list-item v-for="(item, index) in getListCommentToStore" :key="index">
+            <v-list-item-avatar>
+              <img :src="item.owner.avatarUrl" />
+            </v-list-item-avatar>
+            <v-list-item-content>
+              <v-list-item-title>{{item.owner.email}}</v-list-item-title>
+              <v-list-item-subtitle>{{item.title}}</v-list-item-subtitle>
+              <v-divider />
+            </v-list-item-content>
+          </v-list-item>
           <v-card-actions>
             <div class="flex-grow-1"></div>
             <v-btn class="white--text" text @click="cancel()">Close</v-btn>
-            <v-btn class="white--text" text type="submit">Create</v-btn>
           </v-card-actions>
         </v-card>
       </v-form>
@@ -81,39 +94,99 @@ export default {
     return {
       dialog: false,
       asignee: '',
-      comment: '',
-      key:0,
-      members: [{email:'abc@gmail.com',fullName:'phong'},{email:'a@gmail.com',fullName:'tung'}],
+      comment: "",
+      key: 0,
+      flag:'',
+      members: [
+        
+      ]
     };
   },
   created() {
+    console.log(this.asignee)
     this.$store.watch(
       state => state.showDialog.show,
       () => {
         if (this.$store.state.showDialog.show) {
-          this.dialog = true;
+          this.dialog = true
+          this.asignee = this.selectTask.ownerTask
+          const loader = this.$loading.show();
+          this.getListComment(this.selectTask)
+            .then(() => {
+              loader.hide();
+            })
+            .catch(err => {
+              console.log(err);
+              loader.hide();
+            });
         } else {
           this.dialog = false;
         }
       }
     );
-    this.key = this.key +1
+    this.key = this.key + 1;
   },
-  watch : {
-      selectTask(){
-           this.asignee = this.selectTask.ownerTask.email
+  watch: {
+    asignee() {
+      if(this.asignee !== '' && this.asignee !== this.selectTask.ownerTask && this.asignee) {
+        console.log(this.selectTask)
+        let loader = this.$loading.show() //update task
+        this.updateTask({
+          ...this.selectTask,
+          asignee: this.asignee
+        }).then(() => {
+          this.selectTask.ownerTask = this.asignee
+          this.$store.commit("setSnack", {
+              snack: "Updating this task is completed!",
+              color: "#40b883"
+            });
+          loader.hide()
+        }).catch((err) => {
+          this.$store.commit("setSnack", {
+              snack: "Something went wrong, please try again later!",
+              color: "#ff5252"
+            })
+          console.log(err)
+        })
       }
+    }
+  },
+  computed : {
+    ...mapGetters('comment',['getListCommentToStore'])
   },
   methods: {
-      cancel() {
-      this.$store.commit("closeDialog");
+    ...mapActions("comment", ["getListComment", "addComment"]),
+    ...mapActions("task",['updateTask','getAllTask']),
+    submit() {
+      if(this.comment.trim() !== '') {
+        let loader = this.$loading.show()
+      this.addComment({
+        ...this.selectTask,
+        ownerComment: JSON.parse(localStorage.getItem('id')),
+        title: this.comment
+      })
+      .then(() => {
+        this.comment = ''
+        loader.hide()
+      })
+      .catch((err) => {
+        this.$store.commit("setSnack", {
+              snack: "Something went wrong, please try again later!",
+              color: "#ff5252"
+            })
+        console.log(err)
+      })
+      }
+    },
+    cancel() {
+      this.$store.commit("closeDialog")
     },
     remove(item) {
-      const index = this.asignee.indexOf(item.email);
+      const index = this.asignee.indexOf(item);
       if (index >= 0) {
         this.asignee.splice(index, 1);
       }
-    },
+    }
   }
 };
 </script>

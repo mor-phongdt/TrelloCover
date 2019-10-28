@@ -25,12 +25,11 @@
             <v-list-item-avatar color="grey darken-3">
               <v-img
                 class="elevation-6"
-                src="https://avataaars.io/?avatarStyle=Transparent&topType=ShortHairShortCurly&accessoriesType=Prescription02&hairColor=Black&facialHairType=Blank&clotheType=Hoodie&clotheColor=White&eyeType=Default&eyebrowType=DefaultNatural&mouthType=Default&skinColor=Light"
+                :src="item.owner.avatarUrl"
               ></v-img>
             </v-list-item-avatar>
-
             <v-list-item-content>
-              <v-list-item-title >{{item.owner}}</v-list-item-title>
+              <v-list-item-title >{{item.owner.email}}</v-list-item-title>
             </v-list-item-content>
           </v-list-item>
         </v-card-actions>
@@ -53,10 +52,11 @@ export default {
   data() {
     return {
 
-    };
+    }
   },
   created() {
-    const loader = this.$loading.show();
+    const loader = this.$loading.show()
+
     this.getAllProject()
     .then(()=>{
     loader.hide();
@@ -78,6 +78,11 @@ export default {
       this.deleteProject(id)
       .then(()=>{
         loader.hide();
+      }).catch((err)=>{
+        this.$store.commit("setSnack", {
+              snack: "Updating this task is completed!",
+              color: "#40b883"
+            });
       })
     },
     goToDetailProject(id){

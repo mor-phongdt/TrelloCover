@@ -1,12 +1,13 @@
-import Vue from 'vue';
-import Router from 'vue-router';
-import AuthLayout from '../layouts/Auth.vue';
-import CommonLayout from '@/layouts/Common.vue';
-import ProjectPage from '@/page/ProjectBoard.vue';
-import DetailProjectPage from '@/page/KanbanBoard.vue';
-import LoginPage from '../page/auth/Login.vue';
-import RegisterPage from '../page/auth/Register.vue';
-import NotFoundPage from '../page/error/404.vue';
+import Vue from 'vue'
+import Router from 'vue-router'
+import AuthLayout from '../layouts/Auth.vue'
+import CommonLayout from '@/layouts/Common.vue'
+import ProjectPage from '@/page/ProjectBoard.vue'
+import DetailProjectPage from '@/page/KanbanBoard.vue'
+import UserDetail from '@/page/auth/Account.vue'
+import LoginPage from '../page/auth/Login.vue'
+import RegisterPage from '../page/auth/Register.vue'
+import NotFoundPage from '../page/error/404.vue'
 
 Vue.use(Router);
 
@@ -28,6 +29,15 @@ export const router = new Router({
       ],
     },
     {
+      path: '/user',
+      component: CommonLayout,
+      children: [
+        {
+          path: '', name: 'UserDetail', component: UserDetail
+        }
+      ]
+    },
+    {
       path: '/',
       component: AuthLayout,
       children: [
@@ -37,7 +47,8 @@ export const router = new Router({
     },
     {
       path: '*',
-      component: NotFoundPage
+      component: NotFoundPage,
+      name: "NotFoundPage"
     }
   ],
 });
@@ -47,7 +58,7 @@ router.beforeEach((to, from, next) => {
   const publicPages = ['/','/register'];
   const authRequired = !publicPages.includes(to.path);
   // kiem tra duong dan co duoc cho phep vao khong
-  const loggedIn = localStorage.getItem('user');
+  const loggedIn = localStorage.getItem('id');
 
   if (authRequired && !loggedIn) {
     return next('/');

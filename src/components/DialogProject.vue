@@ -47,7 +47,7 @@
             placeholder="Add Member ..."
             outlined
             item-text="fullName"
-            return-object
+            item-value="id"
             multiple
           >
             <template v-slot:selection="data">
@@ -60,7 +60,7 @@
                 class="list-singer"
               >
                 <v-avatar left>
-                  <v-img src="https://image.shutterstock.com/image-vector/blank-avatar-photo-placeholder-flat-260nw-1151124605.jpg"></v-img>
+                  <v-img :src="data.item.avatarUrl"></v-img>
                 </v-avatar>
                 {{ data.item.fullName }}
               </v-chip>
@@ -71,7 +71,7 @@
               </template>
               <template v-else>
                 <v-list-item-avatar>
-                  <img src="https://image.shutterstock.com/image-vector/blank-avatar-photo-placeholder-flat-260nw-1151124605.jpg" />
+                  <img :src="data.item.avatarUrl" />
                 </v-list-item-avatar>
                 <v-list-item-content>
                   <v-list-item-title v-html="data.item.fullName"></v-list-item-title>
@@ -133,8 +133,7 @@ export default {
           this.dialog = false;
         }
       }
-    );
-    this.selectedMembers = [JSON.parse(localStorage.getItem('account'))]
+    )
   },
   watch: {
     toggle_exclusive() {
@@ -146,14 +145,17 @@ export default {
         this.isLoading = true
         this.getListUser()
           .then(() => {
-            let index = this.getAllListUser.findIndex((item)=>{ return item.email !== JSON.parse(localStorage.getItem('account')).email})
-            this.getAllListUser.splice(index,1);
             this.members = this.getAllListUser
+            let index = this.members.findIndex((item )=>{ return item.id == JSON.parse(localStorage.getItem('id'))})
+            this.members.splice(index,1)
           })
           .catch(err => {
             console.log(err)
           })
           .finally(() => (this.isLoading = false))
+    },
+    selectedMembers() {
+      console.log(this.selectedMembers)
     }
   },
   computed : {
@@ -164,9 +166,10 @@ export default {
     submit() {
       this.$validator.validateAll().then(result => {
         if (result) {
+          this.selectedMembers.push(JSON.parse(localStorage.getItem('id')))
           const loader = this.$loading.show();
           this.createProject({
-            owner: JSON.parse(localStorage.getItem('email')),
+            owner: JSON.parse(localStorage.getItem('id')),
             nameProject: this.nameProject,
             contentProject: this.decription,
             createdAt: new Date(),
@@ -177,6 +180,12 @@ export default {
             this.nameProject = "";
             this.decription = "";
             this.cancel();
+          })
+          .catch((err) => {
+            this.$store.commit("setSnack", {
+              snack: "Something went wrong, please try again later!",
+              color: "#ff5252"
+            })
           });
         }
       });

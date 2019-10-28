@@ -87,18 +87,19 @@ export default {
           .then(() => {
             this.$validator.reset();
             loader.hide();
-            // this.$store.commit("setSnack", {
-            //   snack: 'Register is completed. Please login here',
-            //   color: "success"
-            // });
+            this.$store.commit("setSnack", {
+              snack: 'Register is completed. Please check email to verify',
+              color: "#40b883"
+            });
+            
             this.$router.push({ name: "loginPage" });
           })
           .catch(err => {
-            // this.$store.commit("setSnack", {
-            //   snack: err.message,
-            //   color: "error"
-            // });
-          });
+            this.$store.commit("setSnack", {
+              snack: err.message,
+              color: "#ff5252"
+            })
+          })
       }
     }
   }

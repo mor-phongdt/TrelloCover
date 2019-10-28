@@ -1,4 +1,4 @@
-import { projectCollection } from '@/plugins/firebase';
+import { projectCollection, userCollection } from '@/plugins/firebase';
 
 
 export default {
@@ -9,7 +9,8 @@ export default {
     taskDone: [],
     idColumnTodo: undefined,
     idColumnDoing: undefined,
-    idColumnDone: undefined
+    idColumnDone: undefined,
+    memberProject: []
   },
   getters: {
     getTaskTodo: state => {
@@ -20,7 +21,19 @@ export default {
     },
     getTaskDone: state => {
       return state.taskDone
-    }
+    },
+    getMembersProject: state => {
+      return state.memberProject
+    },
+    getIdColumnTodo: (state) => {
+      return state.idColumnTodo 
+    },
+    getIdColumnDoing: (state) => {
+      return state.idColumnDoing
+    },
+    getIdColumnDone: (state) => {
+      return state.idColumnDone
+    },
   },
   mutations: {
     setAllTask: (state, { taskTodo, taskDoing, taskDone }) => {
@@ -36,9 +49,44 @@ export default {
     },
     setIdColumnDone: (state, idColumnDone) => {
       state.idColumnDone = idColumnDone
+    },
+    setMembersProject: (state, membersList) => {
+      state.memberProject = membersList
+    },
+    setTaskTodoing: (state,task) => {
+      state.taskDoing = task
+    },
+    setTaskDone: (state,task) => {
+      state.taskDoing = task
+    },
+    setTaskTodo: (state,task) => {
+      state.taskTodo = task
     }
   },
   actions: {
+    async getMembers({commit}, projectId) { //co member roi
+      let listUserDetail = []
+      let listMembersDetail = []
+      let res1 = await userCollection.get()
+      if (res1) {
+        res1.forEach((item) => {
+          listUserDetail.push({
+            id: item.id,
+            ...item.data()
+          })
+        })
+      }
+      let res2 =  await projectCollection.doc(projectId).get()
+      if (res2) {
+        res2.data().members.forEach((item) => {
+          let user = listUserDetail.find((x) => item === x.id)
+          if(user) {
+            listMembersDetail.push(user)
+          }
+        })
+      }
+      commit('setMembersProject',listMembersDetail)
+    },
     async getAllTask({ commit, getters }, projectId) {
       let taskTodo = []
       let taskDoing = []
@@ -126,6 +174,7 @@ export default {
             resolve(result1, result2, result3);
           })
           .catch((error) => {
+            rejcet(error)
             console.log(error)
           })
       })
@@ -148,6 +197,7 @@ export default {
           .then((response) => {
           })
           .catch((error) => {
+            rejcet(error)
             console.log(error)
           })
       }
@@ -168,6 +218,40 @@ export default {
         })
       })
     },
+    async updateTask({commit,getters}, task) {
+        return new Promise((resolve, r) => {
+          projectCollection.doc(task.projectId)
+        .collection('column').doc(task.status)
+        .collection('task').doc(task.id).update({
+          ownerTask: task.asignee
+        })
+        .then((res) => {
+          if(getters.getIdColumnDoing === task.status) {
+            let  tasks= getters.getTaskDoing
+            let index  = tasks.find(x => x.id === task.id)
+            index.ownerTask = task.asignee
+            commit('setTaskTodoing', tasks)
+          }
+          if(getters.getIdColumnDone === task.status) {
+            let  tasks= getters.getTaskDone
+            let index  = tasks.find(x => x.id === task.id)
+            index.ownerTask = task.asignee
+            commit('setTaskDone', tasks)
+          }
+          if(getters.getIdColumnTodo === task.status) {
+            let  tasks= getters.getTaskTodo
+            let index  = tasks.find(x => x.id === task.id)
+            index.ownerTask = task.asignee
+            commit('setTaskTodo', tasks)
+          }
+          resolve()
+        })
+        .catch(err => {
+          console.log(err)
+          r(err)
+        }) 
+        })
+    },
     async deleteTask(context, task) {
       console.log(task)
       projectCollection.doc(task.projectId)
@@ -176,6 +260,7 @@ export default {
         .then((response) => {
         })
         .catch((error) => {
+          rejcet(error)
           console.log(error)
         })
     }
